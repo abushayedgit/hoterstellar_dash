@@ -1,0 +1,43 @@
+import {
+  faBullhorn,
+  faChampagneGlasses,
+  faChair,
+  faChartLine,
+  faEnvelope,
+  faGaugeHigh,
+  faImages,
+  faReceipt,
+  faStar,
+  faTags,
+  faUserClock,
+  faUserShield,
+  faUsers,
+  faUtensils,
+} from '@fortawesome/free-solid-svg-icons';
+
+export const NAV_ITEMS = [
+  { to: '/dashboard', label: 'Dashboard', icon: faGaugeHigh },
+  { to: '/admins', label: 'Admins', icon: faUserShield, anyOf: ['admins.read', 'admins.manage'] },
+  { to: '/users', label: 'Users', icon: faUsers, anyOf: ['users.read'] },
+  { to: '/categories', label: 'Categories', icon: faTags, anyOf: ['categories.read'] },
+  { to: '/foods', label: 'Foods', icon: faUtensils, anyOf: ['foods.read'] },
+  { to: '/orders', label: 'Orders', icon: faReceipt, anyOf: ['orders.read'] },
+  {
+    to: '/bookings/table',
+    label: 'Table Bookings',
+    icon: faChair,
+    anyOf: ['bookings.read'],
+  },
+  {
+    to: '/bookings/event',
+    label: 'Event Bookings',
+    icon: faChampagneGlasses,
+    anyOf: ['bookings.read'],
+  },
+  { to: '/reviews', label: 'Reviews', icon: faStar, anyOf: ['reviews.read', 'reviews.moderate'] },
+  { to: '/notices', label: 'Notices', icon: faBullhorn, anyOf: ['notices.read'] },
+  { to: '/billboard', label: 'Billboard', icon: faImages, anyOf: ['billboard.read'] },
+  { to: '/contacts', label: 'Contact Messages', icon: faEnvelope, anyOf: ['contact.read'] },
+  { to: '/visitors', label: 'Visitors', icon: faUserClock, anyOf: ['visitor.read'] },
+  { to: '/analytics', label: 'Analytics', icon: faChartLine, anyOf: ['analytics.read'] },
+];
