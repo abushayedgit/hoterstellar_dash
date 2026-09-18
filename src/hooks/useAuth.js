@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useAuthStore } from '../store/authStore';
 import { changePasswordRequest, loginRequest, logoutRequest, meRequest } from '../api/auth';
 
@@ -11,15 +11,16 @@ export const useLogin = () => {
     mutationFn: loginRequest,
     onSuccess: async (data) => {
       const { accessToken, admin, mustChangePassword } = data;
-
+      // console.log('Login successful:', data);
       useAuthStore.getState().setAccessToken(accessToken);
       useAuthStore.getState().setAdmin({ admin });
 
       // Resolve permissions before flipping status to authenticated.
       const me = await meRequest();
+      // console.log('Fetched user data:', me);
       useAuthStore.getState().setSession({
         accessToken,
-        admin: me.admin ?? admin,
+        admin,
         permissions: me.permissions || [],
         mustChangePassword: Boolean(mustChangePassword),
       });
