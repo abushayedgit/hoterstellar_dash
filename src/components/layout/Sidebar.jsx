@@ -34,16 +34,21 @@ function SidebarBody({ onNavigate }) {
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
+              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
               isActive
-                ? 'bg-primary/10 text-primary'
-                : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary',
+                ? 'border-l-2 border-primary bg-primary/10 font-semibold text-primary'
+                : 'border-l-2 border-transparent font-medium text-text-secondary hover:bg-surface-muted hover:text-text-primary',
             )
           }
         >
-          <FontAwesomeIcon icon={item.icon} className="w-4" aria-hidden="true" />
-          <span className="truncate">{item.label}</span>
+          {({ isActive }) => (
+            <>
+              <FontAwesomeIcon icon={item.icon} className="w-4" aria-hidden="true" fixedWidth />
+              <span className="truncate">{item.label}</span>
+              {isActive && <span className="sr-only">(current page)</span>}
+            </>
+          )}
         </NavLink>
       ))}
     </nav>
@@ -53,12 +58,10 @@ function SidebarBody({ onNavigate }) {
 export default function Sidebar({ open, onClose }) {
   return (
     <>
-      {/* Desktop */}
       <aside className="hidden w-64 shrink-0 border-r border-border bg-surface md:flex">
         <SidebarBody />
       </aside>
 
-      {/* Mobile drawer */}
       <AnimatePresence>
         {open && (
           <>
