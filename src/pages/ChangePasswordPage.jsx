@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/authStore';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import PasswordStrengthMeter from '../components/shared/PasswordStrengthMeter';
 import { toast } from '../components/ui/Toast';
 import { ApiError } from '../api/client/normalizeError';
 import { applyServerFieldErrors } from '../utils/formErrors';
@@ -22,6 +23,7 @@ export default function ChangePasswordPage() {
   const {
     register,
     handleSubmit,
+    watch,
     reset,
     setError,
     formState: { errors, isSubmitting },
@@ -30,10 +32,13 @@ export default function ChangePasswordPage() {
     defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   });
 
-  const onSubmit = async ({ currentPassword, newPassword }) => {
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const newPassword = watch('newPassword');
+
+  const onSubmit = async ({ currentPassword, newPassword: next }) => {
     setFormError(null);
     try {
-      await changePassword.mutateAsync({ currentPassword, newPassword });
+      await changePassword.mutateAsync({ currentPassword, newPassword: next });
       clearMustChange();
       reset();
       toast.success('Password updated');
@@ -69,15 +74,17 @@ export default function ChangePasswordPage() {
             error={errors.currentPassword?.message}
             {...register('currentPassword')}
           />
-          <Input
-            id="newPassword"
-            type="password"
-            label="New password"
-            autoComplete="new-password"
-            hint="At least 8 characters."
-            error={errors.newPassword?.message}
-            {...register('newPassword')}
-          />
+          <div className="flex flex-col gap-1.5">
+            <Input
+              id="newPassword"
+              type="password"
+              label="New password"
+              autoComplete="new-password"
+              error={errors.newPassword?.message}
+              {...register('newPassword')}
+            />
+            <PasswordStrengthMeter password={newPassword ?? ''} />
+          </div>
           <Input
             id="confirmPassword"
             type="password"
