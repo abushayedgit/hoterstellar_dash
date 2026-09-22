@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../schemas/auth';
@@ -9,7 +10,43 @@ import Card from '../components/ui/Card';
 import { ApiError } from '../api/client/normalizeError';
 import { applyServerFieldErrors } from '../utils/formErrors';
 
+const REMEMBERED_EMAIL_KEY = 'hoterstellar-remembered-email';
+
+const readRememberedEmail = () => {
+  try {
+    return localStorage.getItem(REMEMBERED_EMAIL_KEY) ?? '';
+  } catch {
+    return '';
+  }
+};
+
+const writeRememberedEmail = (email) => {
+  try {
+    if (email) localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
+    else localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+  } catch {
+    /* ignore */
+  }
+};
+
+const mapLoginError = (err) => {
+  if (!(err instanceof ApiError)) return 'Unable to sign in. Please try again.';
+  switch (err.status) {
+    case 401:
+      return 'Invalid email or password';
+    case 403:
+      return 'Account is deactivated. Contact your administrator.';
+    case 429:
+      return 'Too many login attempts. Try again in 5 minutes.';
+    case 400:
+      return 'Please check your inputs and try again.';
+    default:
+      return err.message || 'Unable to sign in. Please try again.';
+  }
+};
+
 export default function LoginPage() {
+  const remembered = readRememberedEmail();
   const [formError, setFormError] = useState(null);
   const login = useLogin();
 
@@ -20,18 +57,17 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: remembered, password: '', rememberMe: Boolean(remembered) },
   });
 
   const onSubmit = async (values) => {
     setFormError(null);
     try {
-      await login.mutateAsync(values);
+      await login.mutateAsync({ email: values.email, password: values.password });
+      writeRememberedEmail(values.rememberMe ? values.email : '');
     } catch (err) {
       const handled = applyServerFieldErrors(err, setError);
-      if (!handled) {
-        setFormError(err instanceof ApiError ? err.message : 'Unable to sign in');
-      }
+      if (!handled) setFormError(mapLoginError(err));
     }
   };
 
@@ -69,6 +105,20 @@ export default function LoginPage() {
             error={errors.password?.message}
             {...register('password')}
           />
+
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-text-secondary">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-input-border text-primary focus:ring-focus"
+                {...register('rememberMe')}
+              />
+              Remember me
+            </label>
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
 
           {formError && (
             <p
