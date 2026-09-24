@@ -12,9 +12,9 @@ const ChangePasswordPage = lazy(() => import('../pages/ChangePasswordPage'));
 const UnauthorizedPage = lazy(() => import('../pages/UnauthorizedPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const DashboardHomePage = lazy(() => import('../pages/DashboardHomePage'));
-
+const AdminsPage = lazy(() => import('../pages/admins/AdminsPage'));
 const SECTIONS = [
-  { path: 'admins', name: 'Admins', permission: 'admins.read' },
+  // { path: 'admins', name: 'Admins', permission: 'admins.read' },
   { path: 'users', name: 'Users', permission: 'users.read' },
   { path: 'categories', name: 'Categories', permission: 'categories.read' },
   { path: 'foods', name: 'Foods', permission: 'foods.read' },
@@ -88,6 +88,14 @@ export const AppRouter = () => (
               }
             />
           ))}
+          <Route
+            path="admins"
+            element={
+              <PermissionGuard permission="admins.read">
+                <AdminsPage />
+              </PermissionGuard>
+            }
+          />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

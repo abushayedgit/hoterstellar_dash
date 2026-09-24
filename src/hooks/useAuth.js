@@ -11,7 +11,7 @@ export const useLogin = () => {
     mutationFn: loginRequest,
     onSuccess: async (data) => {
       const { accessToken, admin, mustChangePassword } = data;
-      // console.log('Login successful:', data);
+      console.log('Login successful:', data);
       useAuthStore.getState().setAccessToken(accessToken);
       useAuthStore.getState().setAdmin({ admin });
 
@@ -29,6 +29,9 @@ export const useLogin = () => {
 
       if (mustChangePassword) navigate('/change-password', { replace: true });
       else navigate('/dashboard', { replace: true });
+    },
+    onError: (err) => {
+      console.log(err);
     },
   });
 };
