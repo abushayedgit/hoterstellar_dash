@@ -31,18 +31,17 @@ const writeRememberedEmail = (email) => {
 
 const mapLoginError = (err) => {
   if (!(err instanceof ApiError)) return 'Unable to sign in. Please try again.';
-  switch (err.status) {
-    case 401:
-      return 'Invalid email or password';
-    case 403:
-      return 'Account is deactivated. Contact your administrator.';
-    case 429:
-      return 'Too many login attempts. Try again in 5 minutes.';
-    case 400:
-      return 'Please check your inputs and try again.';
-    default:
-      return err.message || 'Unable to sign in. Please try again.';
+
+  if (err.status === 429) {
+    return 'Too many login attempts. Try again in 5 minutes.';
   }
+
+  // Every other backend-reported error carries an authoritative,
+  // human-readable message ("Invalid email or password", "Account is
+  // deactivated", validation messages, etc.). Prefer it.
+  if (err.message) return err.message;
+
+  return 'Unable to sign in. Please try again.';
 };
 
 export default function LoginPage() {
@@ -66,6 +65,8 @@ export default function LoginPage() {
       await login.mutateAsync({ email: values.email, password: values.password });
       writeRememberedEmail(values.rememberMe ? values.email : '');
     } catch (err) {
+      console.log(err);
+
       const handled = applyServerFieldErrors(err, setError);
       if (!handled) setFormError(mapLoginError(err));
     }
