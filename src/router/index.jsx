@@ -13,11 +13,12 @@ const UnauthorizedPage = lazy(() => import('../pages/UnauthorizedPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const DashboardHomePage = lazy(() => import('../pages/DashboardHomePage'));
 const AdminsPage = lazy(() => import('../pages/admins/AdminsPage'));
+const CategoriesPage = lazy(() => import('../pages/categories/CategoriesPage'));
+const FoodsPage = lazy(() => import('../pages/foods/FoodsPage'));
+const FoodFormPage = lazy(() => import('../pages/foods/FoodFormPage'));
+
 const SECTIONS = [
-  // { path: 'admins', name: 'Admins', permission: 'admins.read' },
   { path: 'users', name: 'Users', permission: 'users.read' },
-  { path: 'categories', name: 'Categories', permission: 'categories.read' },
-  { path: 'foods', name: 'Foods', permission: 'foods.read' },
   { path: 'orders', name: 'Orders', permission: 'orders.read' },
   { path: 'bookings/table', name: 'Table Bookings', permission: 'bookings.read' },
   { path: 'bookings/event', name: 'Event Bookings', permission: 'bookings.read' },
@@ -77,6 +78,50 @@ export const AppRouter = () => (
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardHomePage />} />
+
+          <Route
+            path="admins"
+            element={
+              <PermissionGuard permission="admins.read">
+                <AdminsPage />
+              </PermissionGuard>
+            }
+          />
+
+          <Route
+            path="categories"
+            element={
+              <PermissionGuard permission="categories.read">
+                <CategoriesPage />
+              </PermissionGuard>
+            }
+          />
+
+          <Route
+            path="foods"
+            element={
+              <PermissionGuard permission="foods.read">
+                <FoodsPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="foods/new"
+            element={
+              <PermissionGuard permission="foods.create">
+                <FoodFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="foods/:id/edit"
+            element={
+              <PermissionGuard permission="foods.update">
+                <FoodFormPage />
+              </PermissionGuard>
+            }
+          />
+
           {SECTIONS.map((s) => (
             <Route
               key={s.path}
@@ -88,14 +133,6 @@ export const AppRouter = () => (
               }
             />
           ))}
-          <Route
-            path="admins"
-            element={
-              <PermissionGuard permission="admins.read">
-                <AdminsPage />
-              </PermissionGuard>
-            }
-          />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
