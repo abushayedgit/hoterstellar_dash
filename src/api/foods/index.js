@@ -44,3 +44,12 @@ export const updateFood = async (id, formData) => {
 export const deleteFood = async (id) => {
   unwrap(await apiClient.delete(`/api/v1/foods/${id}`));
 };
+
+// Delete a single image from a food. `imageId` is an ImageKit fileId,
+// which contains slashes (e.g. "foods/biryani_abc123"). encodeURIComponent
+// is applied so Express receives the value as a single path segment.
+export const deleteFoodImage = async ({ foodId, imageId }) => {
+  const encoded = encodeURIComponent(imageId);
+  const data = unwrap(await apiClient.delete(`/api/v1/foods/${foodId}/images/${encoded}`));
+  return data.images ?? [];
+};

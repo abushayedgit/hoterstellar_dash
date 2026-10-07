@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFood, deleteFood, getFood, getFoods, updateFood } from '../api/foods';
+import {
+  createFood,
+  deleteFood,
+  deleteFoodImage,
+  getFood,
+  getFoods,
+  updateFood,
+} from '../api/foods';
 import { queryKeys } from '../constants/queryKeys';
 import { toast } from '../components/ui/Toast';
 import { ApiError } from '../api/client/normalizeError';
@@ -39,6 +46,23 @@ export const useUpdateFood = () => {
       invalidate(qc);
       qc.invalidateQueries({ queryKey: queryKeys.foods.detail(id) });
       toast.success('Food updated');
+    },
+  });
+};
+
+export const useDeleteFoodImage = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: deleteFoodImage,
+    onSuccess: (_data, { foodId }) => {
+      // Update the detail cache directly from the response's images[],
+      // then invalidate the list so card thumbnails refresh.
+      qc.invalidateQueries({ queryKey: queryKeys.foods.detail(foodId) });
+      qc.invalidateQueries({ queryKey: queryKeys.foods.all });
+      toast.success('Image removed');
+    },
+    onError: (err) => {
+      if (err instanceof ApiError) toast.error(err.message);
     },
   });
 };
